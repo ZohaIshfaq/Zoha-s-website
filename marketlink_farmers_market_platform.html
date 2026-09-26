@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketLink - Fresh Farm-to-Table Pre-Orders</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter & Playfair Display -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        farm: {
+                            50: '#f4fbf7',
+                            100: '#e1f5ec',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            earth: '#78350f',
+                            cream: '#fef3c7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 flex flex-col justify-between">
+
+    <!-- Navigation Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('marketplace')">
+                <div class="w-12 h-12 bg-farm-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-farm-600/20">
+                    <i data-lucide="sprout" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Market<span class="text-farm-600">Link</span></h1>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">eGreen Basket • Direct From Farm</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links / Role Switcher -->
+            <nav class="hidden md:flex items-center space-x-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                <button onclick="switchTab('marketplace')" id="nav-marketplace" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-white text-farm-700 shadow-sm flex items-center space-x-2">
+                    <i data-lucide="store" class="w-4 h-4"></i>
+                    <span>Customer Market</span>
+                </button>
+                <button onclick="switchTab('vendor')" id="nav-vendor" class="px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Farmer Stall Dashboard</span>
+                </button>
+                <button onclick="switchTab('docs')" id="nav-docs" class="px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span>Project Report & Deliverables</span>
+                </button>
+            </nav>
+
+            <!-- Utility Actions (Cart, Favorites, Map Modal) -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openMapModal()" class="hidden sm:flex items-center space-x-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                    <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Greenwood Farmers Market</span>
+                </button>
+
+                <button onclick="openFavoritesModal()" class="relative p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200" title="Saved Favorites">
+                    <i data-lucide="heart" class="w-5 h-5 text-rose-500"></i>
+                    <span id="fav-badge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                </button>
+
+                <button onclick="openCartModal()" class="relative p-2.5 rounded-xl bg-farm-600 text-white hover:bg-farm-700 transition-colors shadow-md shadow-farm-600/20 flex items-center space-x-2 px-4">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span class="text-sm font-semibold hidden sm:inline">Pre-Order Cart</span>
+                    <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+
+                <!-- Mobile menu toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Menu Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 px-4 py-3 space-y-2">
+            <button onclick="switchTab('marketplace'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2">
+                <i data-lucide="store" class="w-4 h-4"></i><span>Customer Market</span>
+            </button>
+            <button onclick="switchTab('vendor'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Farmer Stall Dashboard</span>
+            </button>
+            <button onclick="switchTab('docs'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-4 h-4"></i><span>Project Report & Deliverables</span>
+            </button>
+            <button onclick="openMapModal(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg font-medium text-emerald-700 bg-emerald-50 flex items-center space-x-2">
+                <i data-lucide="map-pin" class="w-4 h-4"></i><span>View Market Map & Locations</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: CUSTOMER MARKETPLACE & FRONT PAGE -->
+        <!-- ========================================== -->
+        <div id="view-marketplace" class="space-y-8 fade-in">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-900 via-farm-800 to-emerald-700 text-white p-8 sm:p-12 shadow-xl">
+                <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span class="inline-flex items-center space-x-2 bg-emerald-800/80 text-emerald-200 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-600/40">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                        <span>Fresh Harvest Available This Saturday</span>
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-bold tracking-tight font-serif leading-tight">Direct from Local Farms to Your Basket</h2>
+                    <p class="text-emerald-100 text-base sm:text-lg">Pre-order farm-fresh organic vegetables, crisp fruits, artisan dairy, and homemade baked goods. Pick up directly at the weekend farmers market stall!</p>
+                    
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <div class="flex items-center space-x-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-xl text-xs sm:text-sm border border-white/10">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                            <span>100% Locally Grown</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-xl text-xs sm:text-sm border border-white/10">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
+                            <span>Greenwood Park & Downtown Square</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search, Filter & Category Bar -->
+            <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-96">
+                        <i data-lucide="search" class="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400"></i>
+                        <input type="text" id="product-search" oninput="filterProducts()" placeholder="Search fruits, vegetables, dairy, honey..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-farm-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Market Day & Location Selector -->
+                    <div class="flex items-center space-x-3 w-full md:w-auto">
+                        <select id="market-filter" onchange="filterProducts()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-farm-500 w-full md:w-auto">
+                            <option value="all">All Markets</option>
+                            <option value="Greenwood Park">Greenwood Park (Sat 8AM-1PM)</option>
+                            <option value="Downtown Square">Downtown Square (Sun 9AM-2PM)</option>
+                        </select>
+                        <button onclick="openMapModal()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-3 rounded-xl text-sm font-semibold hover:bg-emerald-100 transition-colors flex items-center space-x-2 whitespace-nowrap">
+                            <i data-lucide="map" class="w-4 h-4"></i>
+                            <span>View Map</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Pills -->
+                <div class="flex items-center space-x-2 overflow-x-auto pb-2 pt-1 no-scrollbar">
+                    <button onclick="setCategory('All')" id="cat-All" class="category-btn px-4 py-2 rounded-xl text-sm font-semibold bg-farm-600 text-white shadow-sm shrink-0 transition-all">All Products</button>
+                    <button onclick="setCategory('Vegetables')" id="cat-Vegetables" class="category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all">Vegetables</button>
+                    <button onclick="setCategory('Fruits')" id="cat-Fruits" class="category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all">Fruits</button>
+                    <button onclick="setCategory('Dairy & Eggs')" id="cat-Dairy & Eggs" class="category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all">Dairy & Eggs</button>
+                    <button onclick="setCategory('Baked Goods')" id="cat-Baked Goods" class="category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all">Baked Goods</button>
+                    <button onclick="setCategory('Honey & Preserves')" id="cat-Honey & Preserves" class="category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all">Honey & Preserves</button>
+                </div>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold font-serif text-slate-900">Available Farm Harvests</h3>
+                    <span id="product-count" class="text-xs font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">Showing items</span>
+                </div>
+
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: VENDOR / FARMER DASHBOARD -->
+        <!-- ========================================== -->
+        <div id="view-vendor" class="space-y-8 hidden fade-in">
+            <!-- Vendor Header Banner -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center space-x-2 text-farm-700 text-xs font-bold uppercase tracking-wider mb-1">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Verified Farmer Stall Manager</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-bold font-serif text-slate-900">Green Valley Organic Farm Dashboard</h2>
+                    <p class="text-sm text-slate-500">Manage your weekly stock, review pre-orders, and check total earnings.</p>
+                </div>
+                <button onclick="openAddProductModal()" class="bg-farm-600 text-white px-5 py-3 rounded-xl font-semibold text-sm hover:bg-farm-700 transition-colors shadow-md shadow-farm-600/20 flex items-center space-x-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    <span>Add New Harvest Item</span>
+                </button>
+            </div>
+
+            <!-- Analytics Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-bold">
+                        <i data-lucide="dollar-sign" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Revenue</p>
+                        <h4 id="stat-revenue" class="text-2xl font-bold text-slate-900">$0.00</h4>
+                        <span class="text-xs text-emerald-600 font-medium">Settled in-person at pickup</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center font-bold">
+                        <i data-lucide="clock" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Pre-Orders</p>
+                        <h4 id="stat-orders" class="text-2xl font-bold text-slate-900">0</h4>
+                        <span class="text-xs text-amber-600 font-medium">Awaiting market pickup</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold">
+                        <i data-lucide="package-check" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Completed Pickups</p>
+                        <h4 id="stat-completed" class="text-2xl font-bold text-slate-900">0</h4>
+                        <span class="text-xs text-blue-600 font-medium">Successfully fulfilled</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Tabs: Products vs. Pre-orders -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="flex border-b border-slate-200 bg-slate-50 px-6 pt-4 space-x-4">
+                    <button onclick="switchVendorTab('products')" id="vtab-products-btn" class="pb-3 text-sm font-semibold border-b-2 border-farm-600 text-farm-700 flex items-center space-x-2">
+                        <i data-lucide="boxes" class="w-4 h-4"></i>
+                        <span>Manage Inventory Stock</span>
+                    </button>
+                    <button onclick="switchVendorTab('orders')" id="vtab-orders-btn" class="pb-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2">
+                        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                        <span>Customer Pre-Orders & Pickup Times</span>
+                    </button>
+                </div>
+
+                <!-- Products Table Tab -->
+                <div id="vtab-products-content" class="p-6 overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                <th class="pb-3">Product Item</th>
+                                <th class="pb-3">Category</th>
+                                <th class="pb-3">Price</th>
+                                <th class="pb-3">Stock Quantity</th>
+                                <th class="pb-3">Status</th>
+                                <th class="pb-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-product-list" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pre-Orders Table Tab -->
+                <div id="vtab-orders-content" class="p-6 overflow-x-auto hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                <th class="pb-3">Order ID</th>
+                                <th class="pb-3">Customer</th>
+                                <th class="pb-3">Items Ordered</th>
+                                <th class="pb-3">Total Due</th>
+                                <th class="pb-3">Pickup Slot</th>
+                                <th class="pb-3">Status</th>
+                                <th class="pb-3 text-right">Action / Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-orders-list" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: PROJECT REPORT & DELIVERABLES -->
+        <!-- ========================================== -->
+        <div id="view-docs" class="space-y-8 hidden fade-in">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full">SRS Documentation</span>
+                        <h2 class="text-3xl font-bold font-serif text-slate-900 mt-2">MarketLink Project Deliverables</h2>
+                        <p class="text-sm text-slate-500">Theme: eGreen Basket | Category: End-to-End Web Solutions</p>
+                    </div>
+                    <button onclick="alert('Project SRS package downloaded successfully.')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors flex items-center space-x-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Download Full SRS (.pdf)</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold">1</div>
+                        <h4 class="font-bold text-slate-900">Problem Definition & Scope</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Bridging local farmers and customers by allowing pre-orders and live stock visibility. Strictly NO online payments (pay at market pickup) and NO delivery logistics (pickup only).</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold">2</div>
+                        <h4 class="font-bold text-slate-900">Mandatory Demonstration Video</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">A `.mp4` demonstration video showcasing customer browsing, pre-order cart confirmation, vendor stock management, and order acceptance is required for final submission.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold">3</div>
+                        <h4 class="font-bold text-slate-900">Database Schema Files</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">Includes MySQL/SQL schema definitions for Users, Products, Orders, Reviews, and Markets. Fully initialized with relational integrity.</p>
+                    </div>
+                </div>
+
+                <!-- Database Schema Code View -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-bold font-serif text-slate-900">SQL Database Schema Definition (.sql)</h3>
+                    <div class="bg-slate-900 text-emerald-400 p-6 rounded-2xl font-mono text-xs overflow-x-auto shadow-inner">
+                        <pre><code>-- MarketLink Database Schema
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    role VARCHAR(20) NOT NULL -- 'customer' or 'farmer'
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,
+    farmer_id INT,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    price DECIMAL(10,2) NOT NULL,
+    stock_quantity INT NOT NULL,
+    status VARCHAR(20) -- 'Available' or 'Sold Out'
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_name VARCHAR(100),
+    items_summary TEXT,
+    total_amount DECIMAL(10,2),
+    pickup_slot VARCHAR(50),
+    order_status VARCHAR(30) -- 'Placed', 'Accepted', 'Ready for Pickup'
+);</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CART MODAL -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="shopping-bag" class="w-6 h-6 text-farm-600"></i>
+                    <h3 class="text-xl font-bold font-serif text-slate-900">Your Pre-Order Basket</h3>
+                </div>
+                <button onclick="closeCartModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Important Rule Notice Banner -->
+            <div class="bg-amber-50 border-b border-amber-200 p-4 text-xs text-amber-800 space-y-1">
+                <div class="flex items-center space-x-1 font-bold">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                    <span>Market Rule Notice:</span>
+                </div>
+                <p>• <strong>No Online Payments:</strong> Pay face-to-face in cash or card when picking up at the farmer's stall.</p>
+                <p>• <strong>No Delivery:</strong> All pre-orders are for on-site market pickup only.</p>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cart-items-container" class="p-6 overflow-y-auto space-y-4 flex-grow divide-y divide-slate-100">
+                <!-- Populated via JS -->
+            </div>
+
+            <!-- Cart Footer Summary -->
+            <div class="p-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Select Pickup Time Slot:</span>
+                        <select id="pickup-slot" class="bg-white border border-slate-300 rounded-lg px-3 py-1 text-xs font-semibold text-slate-800">
+                            <option value="Saturday 9:00 AM - 10:00 AM">Saturday 9:00 AM - 10:00 AM</option>
+                            <option value="Saturday 10:30 AM - 11:30 AM">Saturday 10:30 AM - 11:30 AM</option>
+                            <option value="Sunday 10:00 AM - 11:00 AM">Sunday 10:00 AM - 11:00 AM</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+                        <span>Total Due at Pickup:</span>
+                        <span id="cart-total-price" class="text-farm-700">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="confirmPreOrder()" class="w-full bg-farm-600 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-farm-700 transition-colors shadow-md shadow-farm-600/20 flex items-center justify-center space-x-2">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    <span>Confirm Pre-Order for Pickup</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAP MODAL -->
+    <div id="map-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="map-pin" class="w-6 h-6 text-emerald-600"></i>
+                    <h3 class="text-xl font-bold font-serif text-slate-900">Farmers Market Locations & Stalls</h3>
+                </div>
+                <button onclick="closeMapModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-800 space-y-2">
+                    <p class="font-bold text-sm">📍 Greenwood Farmers Market (Main Hub)</p>
+                    <p><strong>Address:</strong> 450 Orchard Lane, Green Valley</p>
+                    <p><strong>Operating Hours:</strong> Every Saturday & Sunday, 8:00 AM – 2:00 PM</p>
+                    <p><strong>Stall Location:</strong> Green Valley Organic Farm, Row B, Stall #12</p>
+                </div>
+                <!-- Embedded Simulated Map View -->
+                <div class="w-full h-64 bg-slate-200 rounded-2xl relative overflow-hidden flex items-center justify-center border border-slate-300">
+                    <div class="absolute inset-0 opacity-40 bg-[radial-gradient(#059669_1px,transparent_1px)] [background-size:24px_24px]"></div>
+                    <div class="relative z-10 text-center space-y-2">
+                        <div class="w-12 h-12 bg-emerald-600 text-white rounded-full mx-auto flex items-center justify-center shadow-lg animate-bounce">
+                            <i data-lucide="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-bold bg-white px-4 py-1.5 rounded-full shadow border border-slate-200 text-slate-800">Greenwood Park Stall #12</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
+                <button onclick="closeMapModal()" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-slate-800">Close Map</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAVORITES MODAL -->
+    <div id="favorites-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="heart" class="w-6 h-6 text-rose-500 fill-rose-500"></i>
+                    <h3 class="text-xl font-bold font-serif text-slate-900">Saved Favorite Farmers & Items</h3>
+                </div>
+                <button onclick="closeFavoritesModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="favorites-list-container" class="p-6 max-h-96 overflow-y-auto space-y-3">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD / EDIT PRODUCT MODAL (Vendor) -->
+    <div id="product-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <h3 id="product-modal-title" class="text-xl font-bold font-serif text-slate-900">Add New Harvest Product</h3>
+                <button onclick="closeAddProductModal()" class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="product-form" onsubmit="saveProduct(event)" class="p-6 space-y-4">
+                <input type="hidden" id="edit-product-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Product Name</label>
+                    <input type="text" id="p-name" required placeholder="e.g. Organic Heirloom Tomatoes" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500 focus:bg-white">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Category</label>
+                        <select id="p-category" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500">
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Dairy & Eggs">Dairy & Eggs</option>
+                            <option value="Baked Goods">Baked Goods</option>
+                            <option value="Honey & Preserves">Honey & Preserves</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Price ($ per unit)</label>
+                        <input type="number" step="0.01" id="p-price" required placeholder="4.99" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500 focus:bg-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Stock Quantity</label>
+                        <input type="number" id="p-stock" required placeholder="25" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Availability Status</label>
+                        <select id="p-status" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500">
+                            <option value="Available">Available (In Stock)</option>
+                            <option value="Sold Out">Sold Out</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Image URL</label>
+                    <input type="url" id="p-image" required placeholder="https://images.unsplash.com/photo-..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-farm-500 focus:bg-white">
+                </div>
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeAddProductModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-farm-600 text-white text-sm font-semibold hover:bg-farm-700 shadow-md shadow-farm-600/20">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>MarketLink (Theme: eGreen Basket) • End-to-End Web Solutions Project • All payments settled in-person at market pickup.</p>
+    </footer>
+
+    <!-- Application Logic Script -->
+    <script>
+        let activeCategory = 'All';
+        let cart = JSON.parse(localStorage.getItem('marketlink_cart')) || [];
+        let favorites = JSON.parse(localStorage.getItem('marketlink_favs')) || [];
+        
+        let products = JSON.parse(localStorage.getItem('marketlink_products')) || [
+            { id: 1, name: 'Organic Heirloom Tomatoes', category: 'Vegetables', price: 4.99, stock: 35, status: 'Available', farm: 'Green Valley Organic Farm', image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80' },
+            { id: 2, name: 'Crisp Honeycrisp Apples', category: 'Fruits', price: 6.50, stock: 50, status: 'Available', farm: 'Orchard Hill Farm', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80' },
+            { id: 3, name: 'Artisan Raw Farm Honey', category: 'Honey & Preserves', price: 12.00, stock: 15, status: 'Available', farm: 'Sunny Brook Apiaries', image: 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?w=600&auto=format&fit=crop&q=80' },
+            { id: 4, name: 'Pasture-Raised Brown Eggs (Dozen)', category: 'Dairy & Eggs', price: 7.25, stock: 0, status: 'Sold Out', farm: 'Green Valley Organic Farm', image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&auto=format&fit=crop&q=80' },
+            { id: 5, name: 'Fresh Sourdough Boule', category: 'Baked Goods', price: 8.00, stock: 10, status: 'Available', farm: 'Country Hearth Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80' },
+            { id: 6, name: 'Organic Kale & Spinach Bundle', category: 'Vegetables', price: 3.75, stock: 22, status: 'Available', farm: 'Green Valley Organic Farm', image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80' }
+        ];
+
+        let orders = JSON.parse(localStorage.getItem('marketlink_orders')) || [
+            { id: 'ORD-8921', customerName: 'Sarah Jenkins', items: 'Organic Heirloom Tomatoes (2x), Sourdough (1x)', total: 17.98, slot: 'Saturday 9:00 AM - 10:00 AM', status: 'Placed' },
+            { id: 'ORD-8922', customerName: 'Michael Chang', items: 'Crisp Honeycrisp Apples (3x)', total: 19.50, slot: 'Saturday 10:30 AM - 11:30 AM', status: 'Accepted' }
+        ];
+
+        function switchTab(tabId) {
+            ['marketplace', 'vendor', 'docs'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                const btn = document.getElementById(`nav-${id}`);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    if(btn) {
+                        btn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-white text-farm-700 shadow-sm flex items-center space-x-2";
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if(btn) {
+                        btn.className = "px-4 py-2 text-sm font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2";
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            const searchVal = document.getElementById('product-search').value.toLowerCase();
+            const marketFilter = document.getElementById('market-filter').value;
+
+            const filtered = products.filter(p => {
+                const matchCat = activeCategory === 'All' || p.category === activeCategory;
+                const matchSearch = p.name.toLowerCase().includes(searchVal) || p.farm.toLowerCase().includes(searchVal);
+                return matchCat && matchSearch;
+            });
+
+            document.getElementById('product-count').innerText = `Showing ${filtered.length} products`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400">No matching farm produce found. Try another search!</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const isFav = favorites.includes(p.id);
+                const isSoldOut = p.status === 'Sold Out' || p.stock <= 0;
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                        <div class="relative h-48 overflow-hidden bg-slate-100">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Fresh+Farm+Produce'">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-slate-800 shadow-sm">
+                                ${p.category}
+                            </span>
+                            <button onclick="toggleFavorite(${p.id})" class="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-md rounded-full shadow-sm text-slate-600 hover:text-rose-500 transition-colors">
+                                <i data-lucide="heart" class="w-4 h-4 ${isFav ? 'text-rose-500 fill-rose-500' : ''}"></i>
+                            </button>
+                            ${isSoldOut ? '<div class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center"><span class="bg-rose-600 text-white font-bold text-xs px-3 py-1.5 rounded-full uppercase tracking-wider shadow">Sold Out</span></div>' : ''}
+                        </div>
+
+                        <div class="p-5 space-y-3 flex-grow flex flex-col justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wide flex items-center space-x-1">
+                                    <i data-lucide="sprout" class="w-3.5 h-3.5"></i>
+                                    <span>${p.farm}</span>
+                                </p>
+                                <h4 class="font-bold font-serif text-slate-900 text-lg mt-1 leading-snug">${p.name}</h4>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                <div>
+                                    <span class="text-xl font-bold text-slate-900">$${p.price.toFixed(2)}</span>
+                                    <span class="text-xs text-slate-400"> / unit</span>
+                                </div>
+                                <button onclick="addToCart(${p.id})" ${isSoldOut ? 'disabled' : ''} class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${isSoldOut ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-farm-600 text-white hover:bg-farm-700 shadow-sm shadow-farm-600/20'}">
+                                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                                    <span>${isSoldOut ? 'Unavailable' : 'Pre-Order'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.id === `cat-${cat}`) {
+                    btn.className = "category-btn px-4 py-2 rounded-xl text-sm font-semibold bg-farm-600 text-white shadow-sm shrink-0 transition-all";
+                } else {
+                    btn.className = "category-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 shrink-0 transition-all";
+                }
+            });
+            renderProducts();
+        }
+
+        function filterProducts() {
+            renderProducts();
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.status === 'Sold Out') return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                if (existing.qty < product.stock) {
+                    existing.qty++;
+                } else {
+                    alert('Cannot add more than available stock.');
+                    return;
+                }
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartUI();
+            openCartModal();
+        }
+
+        function updateCartUI() {
+            localStorage.setItem('marketlink_cart', JSON.stringify(cart));
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-badge').innerText = totalCount;
+
+            const container = document.getElementById('cart-items-container');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="py-12 text-center text-slate-400 text-sm">Your pre-order basket is empty. Browse farm produce to add items!</div>`;
+                document.getElementById('cart-total-price').innerText = '$0.00';
+                return;
+            }
+
+            let totalPrice = 0;
+            container.innerHTML = cart.map(item => {
+                totalPrice += item.price * item.qty;
+                return `
+                    <div class="py-3 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" class="w-12 h-12 rounded-xl object-cover border border-slate-200">
+                            <div>
+                                <h5 class="font-bold text-sm text-slate-900">${item.name}</h5>
+                                <p class="text-xs text-slate-500">$${item.price.toFixed(2)} each</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-1 bg-slate-100 rounded-lg p-1">
+                                <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center font-bold text-slate-600 hover:bg-white rounded">-</button>
+                                <span class="text-xs font-bold px-2">${item.qty}</span>
+                                <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 flex items-center justify-center font-bold text-slate-600 hover:bg-white rounded">+</button>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-slate-400 hover:text-rose-500 p-1">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total-price').innerText = `$${totalPrice.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function changeQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            updateCartUI();
+        }
+
+        function openCartModal() {
+            updateCartUI();
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        function confirmPreOrder() {
+            if (cart.length === 0) return;
+            const slot = document.getElementById('pickup-slot').value;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const itemsSummary = cart.map(i => `${i.name} (${i.qty}x)`).join(', ');
+
+            const newOrder = {
+                id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+                customerName: 'Guest Shopper',
+                items: itemsSummary,
+                total: total,
+                slot: slot,
+                status: 'Placed'
+            };
+
+            orders.unshift(newOrder);
+            localStorage.setItem('marketlink_orders', JSON.stringify(orders));
+            cart = [];
+            localStorage.removeItem('marketlink_cart');
+            updateCartUI();
+            closeCartModal();
+            alert('Pre-order successfully placed! Remember: No online payment required. Pay face-to-face when picking up your items at the market stall.');
+            renderVendorDashboard();
+        }
+
+        function toggleFavorite(productId) {
+            if (favorites.includes(productId)) {
+                favorites = favorites.filter(id => id !== productId);
+            } else {
+                favorites.push(productId);
+            }
+            localStorage.setItem('marketlink_favs', JSON.stringify(favorites));
+            document.getElementById('fav-badge').innerText = favorites.length;
+            document.getElementById('fav-badge').classList.toggle('hidden', favorites.length === 0);
+            renderProducts();
+        }
+
+        function openFavoritesModal() {
+            const container = document.getElementById('favorites-list-container');
+            const favProducts = products.filter(p => favorites.includes(p.id));
+
+            if (favProducts.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">No favorite items saved yet. Click the heart icon on any product!</p>`;
+            } else {
+                container.innerHTML = favProducts.map(p => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <div class="flex items-center space-x-3">
+                            <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover">
+                            <div>
+                                <h5 class="font-bold text-xs text-slate-900">${p.name}</h5>
+                                <p class="text-[10px] text-slate-500">${p.farm} • $${p.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <button onclick="addToCart(${p.id}); closeFavoritesModal();" class="px-3 py-1.5 bg-farm-600 text-white rounded-lg text-xs font-semibold">Pre-Order</button>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('favorites-modal').classList.remove('hidden');
+        }
+
+        function closeFavoritesModal() {
+            document.getElementById('favorites-modal').classList.add('hidden');
+        }
+
+        function openMapModal() {
+            document.getElementById('map-modal').classList.remove('hidden');
+        }
+
+        function closeMapModal() {
+            document.getElementById('map-modal').classList.add('hidden');
+        }
+
+        function switchVendorTab(tab) {
+            const prodBtn = document.getElementById('vtab-products-btn');
+            const ordBtn = document.getElementById('vtab-orders-btn');
+            const prodContent = document.getElementById('vtab-products-content');
+            const ordContent = document.getElementById('vtab-orders-content');
+
+            if (tab === 'products') {
+                prodBtn.className = "pb-3 text-sm font-semibold border-b-2 border-farm-600 text-farm-700 flex items-center space-x-2";
+                ordBtn.className = "pb-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2";
+                prodContent.classList.remove('hidden');
+                ordContent.classList.add('hidden');
+            } else {
+                ordBtn.className = "pb-3 text-sm font-semibold border-b-2 border-farm-600 text-farm-700 flex items-center space-x-2";
+                prodBtn.className = "pb-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2";
+                ordContent.classList.remove('hidden');
+                prodContent.classList.add('hidden');
+            }
+        }
+
+        function renderVendorDashboard() {
+            // Analytics stats
+            const totalRev = orders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + o.total, 128.50);
+            const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
+            const completedCount = orders.filter(o => o.status === 'Completed').length + 14;
+
+            document.getElementById('stat-revenue').innerText = `$${totalRev.toFixed(2)}`;
+            document.getElementById('stat-orders').innerText = activeOrdersCount;
+            document.getElementById('stat-completed').innerText = completedCount;
+
+            // Products Table
+            const pList = document.getElementById('vendor-product-list');
+            pList.innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3.5 flex items-center space-x-3">
+                        <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover border border-slate-200">
+                        <span class="font-bold text-slate-900">${p.name}</span>
+                    </td>
+                    <td class="py-3.5 text-slate-600">${p.category}</td>
+                    <td class="py-3.5 font-semibold text-slate-900">$${p.price.toFixed(2)}</td>
+                    <td class="py-3.5 text-slate-600">${p.stock} units</td>
+                    <td class="py-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${p.status === 'Available' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 text-right space-x-2">
+                        <button onclick="editProduct(${p.id})" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Edit</button>
+                        <button onclick="deleteProduct(${p.id})" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Orders Table
+            const oList = document.getElementById('vendor-orders-list');
+            oList.innerHTML = orders.map(o => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3.5 font-bold text-slate-900">${o.id}</td>
+                    <td class="py-3.5 text-slate-700 font-medium">${o.customerName}</td>
+                    <td class="py-3.5 text-slate-600 max-w-xs truncate">${o.items}</td>
+                    <td class="py-3.5 font-bold text-slate-900">$${o.total.toFixed(2)}</td>
+                    <td class="py-3.5 text-xs text-slate-500">${o.slot}</td>
+                    <td class="py-3.5">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">${o.status}</span>
+                    </td>
+                    <td class="py-3.5 text-right space-x-2">
+                        <button onclick="updateOrderStatus('${o.id}', 'Accepted')" class="px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold">Accept</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'Completed')" class="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold">Mark Complete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddProductModal() {
+            document.getElementById('product-modal-title').innerText = 'Add New Harvest Product';
+            document.getElementById('product-form').reset();
+            document.getElementById('edit-product-id').value = '';
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            const editId = document.getElementById('edit-product-id').value;
+            const name = document.getElementById('p-name').value;
+            const category = document.getElementById('p-category').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const stock = parseInt(document.getElementById('p-stock').value);
+            const status = document.getElementById('p-status').value;
+            const image = document.getElementById('p-image').value;
+
+            if (editId) {
+                const prod = products.find(p => p.id == editId);
+                if (prod) {
+                    prod.name = name;
+                    prod.category = category;
+                    prod.price = price;
+                    prod.stock = stock;
+                    prod.status = status;
+                    prod.image = image;
+                }
+            } else {
+                const newP = {
+                    id: Date.now(),
+                    name,
+                    category,
+                    price,
+                    stock,
+                    status,
+                    farm: 'Green Valley Organic Farm',
+                    image
+                };
+                products.push(newP);
+            }
+
+            localStorage.setItem('marketlink_products', JSON.stringify(products));
+            closeAddProductModal();
+            renderProducts();
+            renderVendorDashboard();
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+            document.getElementById('product-modal-title').innerText = 'Edit Product Stock';
+            document.getElementById('edit-product-id').value = p.id;
+            document.getElementById('p-name').value = p.name;
+            document.getElementById('p-category').value = p.category;
+            document.getElementById('p-price').value = p.price;
+            document.getElementById('p-stock').value = p.stock;
+            document.getElementById('p-status').value = p.status;
+            document.getElementById('p-image').value = p.image;
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to remove this product?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('marketlink_products', JSON.stringify(products));
+                renderProducts();
+                renderVendorDashboard();
+            }
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === orderId);
+            if (ord) {
+                ord.status = newStatus;
+                localStorage.setItem('marketlink_orders', JSON.stringify(orders));
+                renderVendorDashboard();
+            }
+        }
+
+        // Initialize application on load
+        window.onload = function() {
+            renderProducts();
+            renderVendorDashboard();
+            lucide.createIcons();
+            const favCount = favorites.length;
+            if (favCount > 0) {
+                document.getElementById('fav-badge').innerText = favCount;
+                document.getElementById('fav-badge').classList.remove('hidden');
+            }
+        };
+    </script>
+</body>
+</html>
